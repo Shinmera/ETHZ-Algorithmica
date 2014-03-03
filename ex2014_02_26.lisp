@@ -1,5 +1,5 @@
 (declaim (optimize (speed 3) (safety 0) (debug 0))
-         (inline s-linear s-quad s-double new-array-map 0-bound)
+         (inline s-linear s-quad s-double new-array-map 0-bound run-public)
          (ftype (function ((unsigned-byte 5) (unsigned-byte 5) (unsigned-byte 5)) (signed-byte 6)) s-linear s-quad s-double)
          (ftype (function ((signed-byte 6)) (unsigned-byte 5)) 0-bound)
          (ftype (function (function (unsigned-byte 5)) cons) new-array-map)
@@ -47,8 +47,8 @@
   `(progn
     ,@(loop for line in data
             collect `(progn (test-table #'s-linear ,line)
-                           (test-table #'s-quad ,line)
-                           (test-table #'s-double ,line)))))
+                            (test-table #'s-quad ,line)
+                            (test-table #'s-double ,line)))))
 
 (defun run-public ()
   (exercise2 ((5 3 4 5 4)
