@@ -122,4 +122,5 @@
               (14 903 799 -1 1))))
 (declaim (inline run-hard))
 ;; And finally, run the test
-(with-timing 1000000 (run-test))
+;; (with-timing 1000000 (run-hard))
+
