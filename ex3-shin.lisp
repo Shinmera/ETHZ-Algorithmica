@@ -63,14 +63,30 @@
                                                   (alexandria:copy-array ,matrix))))))
        ,@(mapcar #'(lambda (thread) `(sb-thread:join-thread ,thread)) threadsyms))))
 
+(defmacro exercise3-pooled (&optional (matrices *test-data*))
+  `(progn
+     ,@(loop for matrix in matrices
+             collect `(enqueue-job
+                       #'(lambda ()
+                           (compute-max-submatrix-size
+                            (alexandria:copy-array ,matrix)))))
+     (sb-thread:thread-yield)
+     (loop while (< 0 *working*)
+           do (sb-thread:thread-yield))))
+
+(setf *test-data* (read-test-data))
+
 (defun run-hard ()
   (exercise3))
 
 (defun run-hard-threaded ()
   (exercise3-threaded))
 
-(setf *test-data* (read-test-data))
-(run-hard)
+(defun run-hard-pooled ()
+  (exercise3-pooled))
+
+(start-thread-pool)
+(run-hard-pooled)
 
 ;; Unoptimized run:
 ;; CL-USER> (with-timing 100 (run-hard))
@@ -138,4 +154,13 @@
 ;; Avg. run time:   0.76022774
 ;; Sadly the overhead of creating and joining threads
 ;; doesn't seem to bring all that much profit in this case.
-;; OH WELL.
+;; OH WELL. At least it nicely uses almost all of the CPU.
+
+;; Using thread pools:
+;; CL-USER> (with-timing 100 (run-hard-pooled))
+;; Iterations: 100
+;; Total real time: 19.388
+;; Total run time:  73.82
+;; Avg. real time:  0.1919604
+;; Avg. run time:   0.7308911
+;; And this uses ALL of the CPU. Nice.
