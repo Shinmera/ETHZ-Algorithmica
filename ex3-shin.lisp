@@ -54,8 +54,20 @@
                        ;; have to copy at run-time to avoid clash with compute-vertical-prefix-sums modification.
                        (alexandria:copy-array ,matrix)))))
 
+(defmacro exercise3-threaded (&optional (matrices *test-data*))
+  (let ((threadsyms (loop  for i from 0 below (length matrices) collect (gensym (format NIL "THREAD-~d " i)))))
+    `(let ,(loop for matrix in matrices
+                 for thread in threadsyms
+                 collect `(,thread (sb-thread:make-thread
+                                    #'(lambda () (compute-max-submatrix-size
+                                                  (alexandria:copy-array ,matrix))))))
+       ,@(mapcar #'(lambda (thread) `(sb-thread:join-thread ,thread)) threadsyms))))
+
 (defun run-hard ()
   (exercise3))
+
+(defun run-hard-threaded ()
+  (exercise3-threaded))
 
 (setf *test-data* (read-test-data))
 (run-hard)
@@ -116,3 +128,14 @@
 ;; Total run time:  31.857
 ;; Avg. real time:  0.3149307
 ;; Avg. run time:   0.31541583
+
+;; Using threaded runs:
+;; CL-USER> (with-timing 100 (run-hard-threaded))
+;; Iterations: 100
+;; Total real time: 22.72
+;; Total run time:  76.783
+;; Avg. real time:  0.22495049
+;; Avg. run time:   0.76022774
+;; Sadly the overhead of creating and joining threads
+;; doesn't seem to bring all that much profit in this case.
+;; OH WELL.
