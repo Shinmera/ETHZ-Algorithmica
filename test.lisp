@@ -15,12 +15,20 @@
   `(loop with realt = 0
          with runt = 0
          for i from 1 upto ,iterations
-         do (multiple-value-bind (result real run) (time-spent ,@body)
-              (declare (ignore result))
-              (incf realt real)
-              (incf runt run))
+         for (result real run) = (multiple-value-list (time-spent ,@body))
+         do (incf realt real)
+            (incf runt run)
+         maximize real into max-realt
+         maximize run into max-runt
+         minimize real into min-realt
+         minimize run into min-runt
          finally (format T "Iterations: ~d~%~
-                            Total real time: ~f~%~
-                            Total run time:  ~f~%~
-                            Avg. real time:  ~f~%~
-                            Avg. run time:   ~f" ,iterations realt runt (/ realt i) (/ runt i))))
+                            -              REALTIME  RUNTIME~%~
+                            Total time     ~,5f   ~,5f~%~
+                            Maximal time   ~,5f   ~,5f~%~
+                            Minimal time   ~,5f   ~,5f~%~
+                            Average time   ~,5f   ~,5f"
+                         ,iterations realt runt
+                         max-realt max-runt
+                         min-realt min-runt
+                         (/ realt i) (/ runt i))))
