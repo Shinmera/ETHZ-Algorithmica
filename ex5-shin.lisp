@@ -29,9 +29,6 @@
                  (aref heap current))
         do (swap heap parent current)))
 
-(defun insert-many (heap &rest items)
-  (loop for i in items do (insert heap i)))
-
 (defun extract (heap)
   (swap heap 0 (1- (fill-pointer heap)))
   (prog1 (vector-pop heap)
@@ -45,3 +42,17 @@
 
 (defun query-last (heap)
   (aref heap (1- (fill-pointer heap))))
+
+(defun insert-many (heap &rest items)
+  (loop for i in items do (insert heap i)))
+
+(defun exercise5 (data)
+  (let ((heap (make-heap)))
+    (loop for dat in data
+          for i from 0
+          do (insert heap dat)
+             (format T "~a " (query-last heap))
+          finally (progn
+                    (format T "~%")
+                    (loop for j downfrom i to 0
+                          do (format T "~a " (extract heap)))))))
