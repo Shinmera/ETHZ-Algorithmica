@@ -29,3 +29,9 @@ Each item has to be a cons with the car being the value and the cdr the cost."
                          j (- j wi))
                    (decf i)))
       (cons value set))))
+
+
+(find-optimal-set 5 '((1 . 2) (3 . 2) (2 . 1)))
+;; ==> (6 1 2 3)
+(find-optimal-set 3 '((1 . 2) (1 . 5)))
+;; ==> (1 1)
